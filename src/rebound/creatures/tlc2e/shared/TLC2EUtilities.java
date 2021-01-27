@@ -10,13 +10,56 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import rebound.annotations.semantic.reachability.PossiblySnapshotPossiblyLiveValue;
+import rebound.creatures.caosinjection.BasicCaosInjector;
+import rebound.creatures.caosinjection.ExtendedCaosInjector;
+import rebound.creatures.caosinjection.impls.ExtendedFromBasicCaosInjectorDecorator;
+import rebound.creatures.caosinjection.impls.tcp.TCPCaosInjector;
 import rebound.creatures.tlc2e.data.CaosInjectionType;
 import rebound.creatures.tlc2e.data.CaosInjectionType.StandardCaosInjectionType;
 import rebound.creatures.tlc2e.data.StandardTLC2EPublishedInstanceListing;
+import rebound.exceptions.NotYetImplementedException;
 import rebound.net.SimpleNetworkHost;
 
 public class TLC2EUtilities
 {
+	/**
+	 * @throws IllegalArgumentException if caos injection is unavailable or using a newer protocol than this code supports
+	 */
+	public static BasicCaosInjector newBasicCaosInjectorForTLC2EListing(StandardTLC2EPublishedInstanceListing listing) throws IllegalArgumentException
+	{
+		CaosInjectionType caosInjectionType = listing.getCaosInjectionType();
+		
+		if (caosInjectionType == StandardCaosInjectionType.TCP)
+			return new TCPCaosInjector(listing.getCaosInjectionHosts().get(0), listing.getCaosInjectionPort());
+		else if (caosInjectionType == StandardCaosInjectionType.WindowsSharedMemory)
+			throw new NotYetImplementedException();  //TODO!?! :DDD
+		else
+			throw new IllegalArgumentException("Tried to initialize CAOS injection for injection-type: "+caosInjectionType);
+	}
+	
+	
+	
+	/**
+	 * @throws IllegalArgumentException if caos injection is unavailable or using a newer protocol than this code supports
+	 */
+	public static ExtendedCaosInjector newExtendedCaosInjectorForTLC2EListing(StandardTLC2EPublishedInstanceListing listing) throws IllegalArgumentException
+	{
+		BasicCaosInjector basic = newBasicCaosInjectorForTLC2EListing(listing);
+		if (basic instanceof ExtendedCaosInjector)
+			return (ExtendedCaosInjector)basic;
+		else
+			return new ExtendedFromBasicCaosInjectorDecorator(basic);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@PossiblySnapshotPossiblyLiveValue
 	public static Set<StandardTLC2EPublishedInstanceListing> filterHiddensMaybe(Set<StandardTLC2EPublishedInstanceListing> listings, boolean filterHiddens)
 	{
