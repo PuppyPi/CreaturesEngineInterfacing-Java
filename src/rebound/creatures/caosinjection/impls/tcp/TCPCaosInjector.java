@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import rebound.creatures.caosinjection.BasicCaosInjector;
+import rebound.net.SimpleNetworkHost;
 
 public class TCPCaosInjector
 implements BasicCaosInjector
@@ -16,6 +17,17 @@ implements BasicCaosInjector
 	protected final String host;
 	protected final int port;
 	protected final Charset encoding;
+	
+	
+	public TCPCaosInjector(SimpleNetworkHost host, int port)
+	{
+		this(host.toString(), port);
+	}
+	
+	public TCPCaosInjector(SimpleNetworkHost host, int port, Charset encoding)
+	{
+		this(host.toString(), port, encoding);
+	}
 	
 	public TCPCaosInjector(String host, int port)
 	{
